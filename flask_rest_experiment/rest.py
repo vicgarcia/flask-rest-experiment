@@ -35,6 +35,7 @@ class RestView(MethodView):
         return current_app.db.query(self.model_class)
 
     def post(self):
+        logger.debug(f'{self.__class__.__name__}.post request.json={request.json}')
         try:
             serializer = self.serializer_class()
             obj = serializer.load(request.json, session=current_app.db)
@@ -44,10 +45,11 @@ class RestView(MethodView):
         except ValidationError as e:
             return jsonify({'error': e.messages}), 400
         except Exception as e:
-            logger.exception(f'ERROR : {self.__class__.__name__}:post')
+            logger.exception(f'{self.__class__.__name__}.post exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
 
     def get(self, obj_id):
+        logger.debug(f'{self.__class__.__name__}.get request.args={dict(request.args)} obj_id={obj_id}')
         try:
             serializer = self.serializer_class()
             if obj_id is not None:
@@ -68,10 +70,11 @@ class RestView(MethodView):
         except NotFoundException:
             return '', 404
         except Exception as e:
-            logger.exception(f'ERROR : {self.__class__.__name__}:get')
+            logger.exception(f'{self.__class__.__name__}.get exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
 
     def patch(self, obj_id):
+        logger.debug(f'{self.__class__.__name__}.patch request.json={request.json}')
         try:
             serializer = self.serializer_class()
             obj = self.get_object(obj_id)
@@ -84,10 +87,11 @@ class RestView(MethodView):
         except ValidationError as e:
             return jsonify({'error': e.messages}), 400
         except Exception as e:
-            logger.exception(f'ERROR : {self.__class__.__name__}:patch')
+            logger.exception(f'{self.__class__.__name__}.patch exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
 
     def delete(self, obj_id):
+        logger.debug(f'{self.__class__.__name__}.delete obj_id={obj_id}')
         try:
             obj = self.get_object(obj_id)
             current_app.db.delete(obj)
@@ -96,7 +100,7 @@ class RestView(MethodView):
         except NotFoundException:
             return '', 404
         except Exception as e:
-            logger.exception(f'ERROR : {self.__class__.__name__}:delete')
+            logger.exception(f'{self.__class__.__name__}.delete exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
 
     @classmethod
@@ -125,5 +129,5 @@ class SoftDeleteMixin:
         except NotFoundException:
             return '', 404
         except Exception as e:
-            logger.exception(f'ERROR : {self.__class__.__name__}:delete')
+            logger.exception(f'{self.__class__.__name__}.delete exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
