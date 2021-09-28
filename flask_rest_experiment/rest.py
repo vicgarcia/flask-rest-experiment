@@ -17,6 +17,11 @@ class NotFoundException(Exception):
     pass
 
 
+class ParameterException(Exception):
+    def __init__(self, message, **kwargs):
+        self.message = message
+
+
 class RestView(MethodView):
     model_class = None
     serializer_class = None
@@ -43,7 +48,7 @@ class RestView(MethodView):
             current_app.db.commit()
             return serializer.dumps(obj)
         except ValidationError as e:
-            return jsonify({'error': e.messages}), 400
+            return jsonify({'errors': e.messages}), 400
         except Exception as e:
             logger.exception(f'{self.__class__.__name__}.post exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
@@ -56,8 +61,11 @@ class RestView(MethodView):
                 obj = self.get_object(obj_id)
                 return serializer.dumps(obj)
             else:
-                limit = int(request.args.get('limit', 10))
-                offset = int(request.args.get('offset', 0))
+                try:
+                    limit = int(request.args.get('limit', 10))
+                    offset = int(request.args.get('offset', 0))
+                except ValueError:
+                    raise ParameterException('invalid limit/offset parameters')
                 query = self.get_objects_query()
                 return jsonify({
                     'data': serializer.dump(query.limit(limit).offset(offset), many=True),
@@ -65,10 +73,10 @@ class RestView(MethodView):
                     'limit': limit,
                     'offset': offset,
                 })
-        except ValueError:
-            return jsonify({'error': 'invalid limit/offset parameters'}), 400
         except NotFoundException:
             return '', 404
+        except ParameterException as e:
+            return jsonify({'error': e.message}), 400
         except Exception as e:
             logger.exception(f'{self.__class__.__name__}.get exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500
@@ -85,7 +93,7 @@ class RestView(MethodView):
         except NotFoundException:
             return '', 404
         except ValidationError as e:
-            return jsonify({'error': e.messages}), 400
+            return jsonify({'errors': e.messages}), 400
         except Exception as e:
             logger.exception(f'{self.__class__.__name__}.patch exception')
             return jsonify({'error': 'an unhandled error occurred'}), 500

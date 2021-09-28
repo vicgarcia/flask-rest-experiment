@@ -1,9 +1,9 @@
 import logging
 from flask import current_app, request
-from .rest import RestView, SoftDeleteMixin
+from .rest import RestView, SoftDeleteMixin, ParameterException
 from .models import (
     SimpleExample, SimpleExampleSerializer,
-    ComplexExample, ComplexExampleSerializer,
+    ComplexExample, ComplexType, ComplexExampleSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -25,17 +25,17 @@ class ComplexExampleView(RestView, SoftDeleteMixin):
 
         # allow search by 'type'
         type_param = request.args.get('type', None)
-        if type_param:
+        if type_param and type_param in ComplexType.values():
             query = query.filter_by(type=str(type_param))
+        elif type_param:
+            raise ParameterException('must provide a valid type parameter')
 
         # allow search by date, between 'start' and 'end'
         start_param = request.args.get('start', None)
         end_param = request.args.get('end', None)
         if start_param and end_param:
             query = query.filter(self.model_class.date.between(start_param, end_param))
-
-        # idea: use a custom exception type to set message + raise on error
-        #       catch the exception and turn the message into error response
-        #       similar to the way serializers raise ValidationError
+        elif (start_param and not end_param) or (end_param and not start_param):
+            raise ParameterException('must provide both start and end parameters')
 
         return query

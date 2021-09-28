@@ -31,6 +31,10 @@ class ComplexType(Enum):
     one = 'one'
     two = 'two'
 
+    @classmethod
+    def values(cls):
+        return list(map(lambda c: c.value, cls))
+
 
 class ComplexExample(Base):
     __tablename__ = 'complex_examples'
