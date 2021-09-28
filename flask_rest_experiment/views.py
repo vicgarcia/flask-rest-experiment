@@ -14,7 +14,7 @@ class SimpleExampleView(RestView):
     serializer_class = SimpleExampleSerializer
 
 
-class ComplexExampleView(RestView, SoftDeleteMixin):
+class ComplexExampleView(SoftDeleteMixin, RestView):
     model_class = ComplexExample
     serializer_class = ComplexExampleSerializer
 
