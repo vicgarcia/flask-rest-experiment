@@ -1,0 +1,6 @@
+# exclude python runtime files
+__pycache__
+*.pyc
+
+# exclude sqlite db file
+flask_rest_experiment.db
