@@ -6,10 +6,16 @@ from .rest import GET, POST, PATCH, DELETE
 logger = logging.getLogger(__name__)
 
 
+class config:
+    DEBUG = True
+    JSON_SORT_KEYS = False
+    DATABASE_CONNECTION = 'sqlite:///flask_rest_experiment.db'
+
+
 def create_app():
 
     app = Flask(__name__, instance_relative_config=True)
-    app.config['JSON_SORT_KEYS'] = False
+    app.config.from_object('flask_rest_experiment.app.config')
 
     engine = create_engine(app.config['DATABASE_CONNECTION'])
     session_maker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
