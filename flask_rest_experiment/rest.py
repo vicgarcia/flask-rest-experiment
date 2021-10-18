@@ -1,7 +1,7 @@
 import logging
 from flask import current_app, json, request, jsonify
 from flask.views import MethodView
-from .database import ValidationError
+from marshmallow import ValidationError
 
 logger = logging.getLogger(__name__)
 
