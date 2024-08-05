@@ -53,15 +53,12 @@ Views extened from the `RestView` base class are defined in `flask_rest_experime
 The view class provides a class method to create the necessary routing for a Flask app to include our REST API as part of an app. Call the `add_url_rules` class method and specify the Flask app, the url for the endpoint set, and a name for the views.
 
 ```
-def create_app():
+app = Flask(__name__, instance_relative_config=True)
 
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object('flask_rest_experiment.app.config')
+...
 
-    ...
-
-    from .views import SimpleExampleView
-    SimpleExampleView.add_url_rules(app, '/simple-example', 'simple-example')
+from .views import SimpleExampleView
+SimpleExampleView.add_url_rules(app, '/simple-example', 'simple-example')
 ```
 
 The flask application and necessary routing to use the defined API is defined in `flask_rest_experiment/app.py`.
