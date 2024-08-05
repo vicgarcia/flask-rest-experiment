@@ -30,7 +30,6 @@ class SimpleExampleSerializer(SQLAlchemyAutoSchema):
     class Meta:
         model = SimpleExample
         load_instance = True
-
 ```
 
 The `RestView` class defineds GET (query and retrieve), POST (create), PATCH (edit), and DELETE (delete) handlers for the endpoint. Extend from `RestView` to create an REST API for a given ORM model.
