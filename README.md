@@ -18,8 +18,6 @@ class SimpleExample(Base):
     name = sa.Column(sa.String(40), nullable=False)
 ```
 
-ORM models and serializers are defined in `flask_rest_experiment/models.py` in this repository.
-
 Define a serializer using Marshmallow. Ther serializer will handle conversion between JSON data and the ORM model.
 
 ```
@@ -32,7 +30,14 @@ class SimpleExampleSerializer(SQLAlchemyAutoSchema):
         load_instance = True
 ```
 
-The `RestView` class defineds GET (query and retrieve), POST (create), PATCH (edit), and DELETE (delete) handlers for the endpoint. Extend from `RestView` to create an REST API for a given ORM model.
+ORM models and serializers are defined in `flask_rest_experiment/models.py` in this repository.
+
+The `RestView` class defineds GET (query and retrieve), POST (create), PATCH (edit), and DELETE (delete) handlers for the endpoint. It extends from from the Flask [MethodView](https://flask.palletsprojects.com/en/2.3.x/views/) class and implements the logic to utilize the serializer and manipulate the ORM model.
+
+The `RestView` class is defined in `flask_rest_experiment/rest.py`.
+
+
+Extend from `RestView` to create an REST API for a given ORM model.
 
 ```
 from .rest import RestView
@@ -42,16 +47,21 @@ class SimpleExampleView(RestView):
     serializer_class = SimpleExampleSerializer
 ```
 
-The `RestView` class is defined in `flask_rest_experiment/rest.py`.
-
 Views extened from the `RestView` base class are defined in `flask_rest_experiment/views.py`.
+
 
 The view class provides a class method to create the necessary routing for a Flask app to include our REST API as part of an app. Call the `add_url_rules` class method and specify the Flask app, the url for the endpoint set, and a name for the views.
 
 ```
-from .views import SimpleExampleView
+def create_app():
 
-SimpleExampleView.add_url_rules(app, '/simple-example', 'simple-example')
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object('flask_rest_experiment.app.config')
+
+    ...
+
+    from .views import SimpleExampleView
+    SimpleExampleView.add_url_rules(app, '/simple-example', 'simple-example')
 ```
 
 The flask application and necessary routing to use the defined API is defined in `flask_rest_experiment/app.py`.
