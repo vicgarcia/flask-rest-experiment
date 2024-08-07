@@ -63,7 +63,6 @@ SimpleExampleView.add_url_rules(app, '/simple-example', 'simple-example')
 
 The flask application and necessary routing to use the defined API is defined in `flask_rest_experiment/app.py`.
 
-Another example of this which implements a more real world usecase and expands on some architectural ideas can be found in another project [here](https://github.com/vicgarcia/mpg-api-example).
 
 ## code
 
